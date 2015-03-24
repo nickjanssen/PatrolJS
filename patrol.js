@@ -9,7 +9,7 @@
 
 	var _, THREE, ProgressBar;
 
-	if (typeof exports === 'undefined') {
+	if (typeof module !== 'undefined' && module.exports) {
 		_ = require('underscore');
 		THREE = require('three');
 		ProgressBar = require('progress');

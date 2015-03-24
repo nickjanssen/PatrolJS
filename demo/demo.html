@@ -84,8 +84,6 @@
 				camera.position.y = 14;
 				camera.position.z = 10;
 
-				// scene
-
 				scene = new THREE.Scene();
 
 				var ambient = new THREE.AmbientLight( 0x101030 );
@@ -103,26 +101,18 @@
 		        }, null);
 
 		        jsonLoader.load( 'meshes/level.nav.js', function( geometry, materials ) {
-					// for ( var i = 0; i < geometry.faces.length; i ++ ) {
-					//     var face = geometry.faces[ i ];
-					//     face.color.setHex( Math.random() * 0xffffff );
-					// }
 
 					var zoneNodes = patrol.buildNodes(geometry);
 
 					patrol.setZoneData('level', zoneNodes);
 
-					console.log(zoneNodes);
-
 		        	var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
-		        		// vertexColors: THREE.FaceColors,
 		        		color: 0xd79fd4,
 		        		opacity: 0.5,
 		        		transparent: true
 		        	}));
 
 		        	scene.add(mesh);
-
 
 		        	// Set the player's navigation mesh group
 		        	playerNavMeshGroup = patrol.getGroup('level', player.position);
@@ -177,7 +167,7 @@
 					var vec = intersects[0].point;
 					target.position.copy(vec);
 
-					// Calculate a path to the target
+					// Calculate a path to the target and store it
 					calculatedPath = patrol.findPath(player.position, target.position, 'level', playerNavMeshGroup);
 
 					if (calculatedPath && calculatedPath.length) {
@@ -202,9 +192,9 @@
 						pathLines = new THREE.Line( geometry, material );
 						scene.add( pathLines );
 
+						// Draw debug cubes except the last one. Also, add the player position.
 						var debugPath = [player.position].concat(calculatedPath);
 
-						// Draw debug cubes except the last one
 						for (var i = 0; i < debugPath.length - 1; i++) {
 							geometry = new THREE.BoxGeometry( 0.3, 0.3, 0.3 );
 							var material = new THREE.MeshBasicMaterial( {color: 0x00ffff} );
@@ -214,11 +204,9 @@
 						}
 					}
 				}
-
 			}
 
 			function onWindowResize() {
-
 				windowHalfX = window.innerWidth / 2;
 				windowHalfY = window.innerHeight / 2;
 
@@ -226,12 +214,9 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 			}
 
-
 			function animate() {
-
                 var currTime = window.performance.now();
                 var delta = (currTime - lastFrameTime) / 1000;
                 var dTime = Math.min(delta, maxFrameTime);
@@ -242,11 +227,9 @@
 
 				requestAnimationFrame( animate );
 				render();
-
 			}
 
 			function tick(dTime) {
-
 				if (!level) {
 					return;
 				}
@@ -263,8 +246,8 @@
 					if (vel.lengthSq() > 0.05 * 0.05) {
 						vel.normalize();
 
-						// move player to target
-						player.position.add(vel.multiplyScalar(dTime*speed));
+						// Mve player to target
+						player.position.add(vel.multiplyScalar(dTime * speed));
 					}
 					else {
 						// Remove node from the path we calculated
@@ -274,27 +257,12 @@
 			}
 
 			function render() {
-
-
-
-
 				camera.lookAt( scene.position );
 				camera.updateMatrixWorld();
 
 				renderer.render( scene, camera );
 
 			}
-
-			// function render() {
-
-				// camera.position.x = -10;
-				// camera.position.y = 14;
-
-				// camera.lookAt( scene.position );
-
-			// 	renderer.render( scene, camera );
-
-			// }
 
 		</script>
 

@@ -1,29 +1,30 @@
 {
-  "name": "patroljs",
-  "version": "0.1.0",
-  "description": "Navigation mesh toolkit for ThreeJS",
-  "main": "Gruntfile.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "patrol",
-    "patroljs",
-    "patrol.js",
-    "three",
-    "three.js",
-    "threejs",
-    "pathfinding",
-    "astar",
-    "nav",
-    "navmesh",
-    "navigation"
-  ],
-  "author": "Nick Janssen",
-  "license": "MIT",
-  "dependencies": {
-    "progress": "^1.1.8",
-    "shelljs": "^0.4.0",
-    "underscore": "^1.8.2"
-  }
+	"name": "patroljs",
+	"version": "0.1.0",
+	"description": "Navigation mesh toolkit for ThreeJS",
+	"main": "patrol.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"patrol",
+		"patroljs",
+		"patrol.js",
+		"three",
+		"three.js",
+		"threejs",
+		"pathfinding",
+		"astar",
+		"nav",
+		"navmesh",
+		"navigation"
+	],
+	"author": "Nick Janssen",
+	"license": "MIT",
+	"dependencies": {
+		"three": "0.69.0",
+		"progress": "^1.1.8",
+		"shelljs": "^0.4.0",
+		"underscore": "^1.8.2"
+	}
 }
