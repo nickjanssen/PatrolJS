@@ -43,7 +43,6 @@
 
 			var player, target;
 
-
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -93,10 +92,17 @@
 		        }, null);
 
 		        // Add test sphere
-				var geometry = new THREE.SphereGeometry( 0.2, 32, 32 );
+				var geometry = new THREE.SphereGeometry( 0.25, 32, 32 );
 				var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
 				player = new THREE.Mesh( geometry, material );
 				scene.add( player );
+
+				player.position.set(-3.5, 0.5, 5.5);
+
+				geometry = new THREE.CubeGeometry( 0.5, 0.5, 0.5 );
+				var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
+				target = new THREE.Mesh( geometry, material );
+				scene.add( target );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -106,8 +112,7 @@
 
 				raycaster = new THREE.Raycaster();
 
-				// document.addEventListener( 'click', onDocumentMouseClick, false );
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'click', onDocumentMouseClick, false );
 
 				//
 
@@ -115,37 +120,25 @@
 
 			}
 
-			// function onDocumentMouseClick (event) {
+			function onDocumentMouseClick (event) {
 
-			// 	mouse.x = ( event.clientX - windowHalfX ) / 2;
-			// 	mouse.y = ( event.clientY - windowHalfY ) / 2;
+				event.preventDefault();
 
-			// 	camera.updateMatrixWorld();
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-			// 	raycaster.setFromCamera( mouse, camera );
+				camera.updateMatrixWorld();
 
-			// 	var intersects = raycaster.intersectObjects( scene.children );
+				raycaster.setFromCamera( mouse, camera );
 
-			// 	if ( intersects.length > 0 ) {
+				var intersects = raycaster.intersectObject( level );
 
-			// 		if ( intersectedObject != intersects[ 0 ].object ) {
+				if ( intersects.length > 0 ) {
+					var vec = intersects[0].point;
+					target.position.copy(vec);
+				}
 
-			// 			if ( intersectedObject ) intersectedObject.material.emissive.setHex( intersectedObject.currentHex );
-
-			// 			intersectedObject = intersects[ 0 ].object;
-			// 			intersectedObject.currentHex = intersectedObject.material.emissive.getHex();
-			// 			intersectedObject.material.emissive.setHex( 0xff0000 );
-
-			// 		}
-			// 		else {
-			// 			if ( intersectedObject ) intersectedObject.material.emissive.setHex( intersectedObject.currentHex );
-			// 			intersectedObject = null;
-			// 		}
-
-			// 	}
-
-
-			// }
+			}
 
 			function onWindowResize() {
 
@@ -156,15 +149,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 			}
 
@@ -186,21 +170,7 @@
 				camera.position.y = 14;
 
 				camera.lookAt( scene.position );
-
 				camera.updateMatrixWorld();
-
-				// find intersections
-
-				raycaster.setFromCamera( mouse, camera );
-
-				var intersects = raycaster.intersectObject( level );
-
-				if ( intersects.length > 0 ) {
-					var vec = intersects[0].point;
-
-					player.position.copy(vec);
-
-				}
 
 				renderer.render( scene, camera );
 
