@@ -52,7 +52,7 @@ Every navigation mesh consists out of many groups of polygons. This is because, 
 
 A level may only contain one group of polygons, but in practice these are usually more. The demo scene has around 50 groups for example. This is because Blender tries to bake the top surfaces of obstacles like crates and other inaccessible areas as well. You may remove these areas yourself for an optimization, if you wish, before converting the file to JSON for use with PatrolJS.
 
-When calculating a path, PatrolJS needs to know what group of polygons you are searching in. In your game or app, you should precalculate this position using `getGroup(levelName, position)' and store it for when you want to calculate a path later.
+When calculating a path, PatrolJS needs to know what group of polygons you are searching in. In your game or app, you should precalculate this position using `getGroup(levelName, position)` and store it for when you want to calculate a path later.
 
 ```
 // Calculate a path to the target
@@ -63,9 +63,9 @@ Finally you can calculate a path using `findPath(beginPosition, targetPosition, 
 
 ## Thanks to
 
-[bgrin's astar library](https://github.com/bgrins/javascript-astar)
-[Digesting Duck's Simple Stupid Funnel Algorithm](http://digestingduck.blogspot.jp/2010/03/simple-stupid-funnel-algorithm.html)
-[Recastnavigation's level mesh](https://github.com/memononen/recastnavigation)
+* [bgrin's astar library](https://github.com/bgrins/javascript-astar)
+* [Digesting Duck's Simple Stupid Funnel Algorithm](http://digestingduck.blogspot.jp/2010/03/simple-stupid-funnel-algorithm.html)
+* [Recastnavigation's level mesh](https://github.com/memononen/recastnavigation)
 
 ## License
 
