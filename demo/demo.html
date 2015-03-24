@@ -33,8 +33,14 @@
 
 			var mouse = new THREE.Vector2();
 
+			var startTime	= Date.now();
+
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
+
+			var lastFrameTime = 0;
+			var maxFrameTime = 0.03;
+			var elapsedTime = 0;
 
 			var level;
 
@@ -99,10 +105,12 @@
 
 				player.position.set(-3.5, 0.5, 5.5);
 
-				geometry = new THREE.CubeGeometry( 0.5, 0.5, 0.5 );
+				geometry = new THREE.CubeGeometry( 0.3, 0.3, 0.3 );
 				var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
 				target = new THREE.Mesh( geometry, material );
 				scene.add( target );
+
+				target.position.copy(player.position);
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -152,11 +160,33 @@
 
 			}
 
+
 			function animate() {
+
+                var currTime = window.performance.now();
+                var delta = (currTime - lastFrameTime) / 1000;
+                var dTime = Math.min(delta, maxFrameTime);
+                elapsedTime += delta;
+                lastFrameTime = currTime;
+
+                tick(dTime);
 
 				requestAnimationFrame( animate );
 				render();
 
+			}
+
+			function tick(dTime) {
+				var speed = 5;
+
+				var vel = target.position.clone().sub(player.position);
+
+				if (vel.lengthSq() > 0.01) {
+					vel.normalize();
+
+					// move player to target
+					player.position.add(vel.multiplyScalar(dTime*speed));
+				}
 			}
 
 			function render() {
