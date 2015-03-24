@@ -21,13 +21,14 @@
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.2/underscore-min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.js"></script>
+		<script src="OrbitControls.js"></script>
 		<script src="../patrol.js"></script>
 
 		<script>
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, controls;
 
 			var raycaster, intersectedObject;
 
@@ -53,12 +54,16 @@
 
 			var calculatedPath = null;
 
+			var pathLines;
+
 			function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.x = -10;
+				camera.position.y = 14;
 				camera.position.z = 10;
 
 				// scene
@@ -92,6 +97,7 @@
 					console.log(zoneNodes);
 
 		        	var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
+		        		// vertexColors: THREE.FaceColors,
 		        		color: 0xd79fd4,
 		        		opacity: 0.5,
 		        		transparent: true
@@ -113,7 +119,7 @@
 
 				player.position.set(-3.5, 0.5, 5.5);
 
-				geometry = new THREE.CubeGeometry( 0.3, 0.3, 0.3 );
+				geometry = new THREE.BoxGeometry( 0.3, 0.3, 0.3 );
 				var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
 				target = new THREE.Mesh( geometry, material );
 				scene.add( target );
@@ -129,10 +135,10 @@
 				raycaster = new THREE.Raycaster();
 
 				document.addEventListener( 'click', onDocumentMouseClick, false );
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				controls = new THREE.OrbitControls( camera );
+				controls.damping = 0.2;
 
 			}
 
@@ -155,6 +161,40 @@
 
 					// Calculate a path to the target
 					calculatedPath = patrol.findPath(player.position, target.position, 'level', playerNavMeshGroup);
+
+					if (calculatedPath && calculatedPath.length) {
+
+						if (pathLines) {
+							scene.remove(pathLines);
+						}
+
+						var material = new THREE.LineBasicMaterial({
+							color: 0x0000ff,
+							linewidth: 2
+						});
+
+						var geometry = new THREE.Geometry();
+						geometry.vertices.push(player.position);
+
+						// Draw debug lines
+						for (var i = 0; i < calculatedPath.length; i++) {
+							geometry.vertices.push(calculatedPath[i].clone().add(new THREE.Vector3(0, 0.2, 0)));
+						}
+
+						pathLines = new THREE.Line( geometry, material );
+						scene.add( pathLines );
+
+						var debugPath = [player.position].concat(calculatedPath);
+
+						// Draw debug cubes except the last one
+						for (var i = 0; i < debugPath.length - 1; i++) {
+							geometry = new THREE.BoxGeometry( 0.3, 0.3, 0.3 );
+							var material = new THREE.MeshBasicMaterial( {color: 0x00ffff} );
+							var node = new THREE.Mesh( geometry, material );
+							node.position.copy(debugPath[i]);
+							pathLines.add( node );
+						}
+					}
 				}
 
 			}
@@ -218,8 +258,7 @@
 			function render() {
 
 
-				camera.position.x = -10;
-				camera.position.y = 14;
+
 
 				camera.lookAt( scene.position );
 				camera.updateMatrixWorld();
