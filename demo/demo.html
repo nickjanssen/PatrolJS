@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>PatrolJS Demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	</head>
+
+	<style>
+		body {
+			font-family: Arial;
+			background-color: #000;
+			color: #fff;
+			margin: 0px;
+			overflow: hidden;
+		}
+	</style>
+
+	<body>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.2/underscore-min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.js"></script>
+		<script src="../patrol.js"></script>
+
+		<script>
+
+			var container;
+
+			var camera, scene, renderer;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+
+			init();
+			animate();
+
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 10;
+
+				// scene
+
+				scene = new THREE.Scene();
+
+				var ambient = new THREE.AmbientLight( 0x101030 );
+				scene.add( ambient );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				directionalLight.position.set( 0, 0.5, 0.5 );
+				scene.add( directionalLight );
+
+  				var jsonLoader = new THREE.JSONLoader();
+
+		        jsonLoader.load( 'meshes/level.js', function( geometry, materials ) {
+		        	var mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
+		        	scene.add(mesh);
+		        }, null);
+
+		        jsonLoader.load( 'meshes/level.nav.js', function( geometry, materials ) {
+					// for ( var i = 0; i < geometry.faces.length; i ++ ) {
+					//     var face = geometry.faces[ i ];
+					//     face.color.setHex( Math.random() * 0xffffff );
+					// }
+
+					var zoneNodes = patrol.buildNodes(geometry);
+
+					patrol.setZoneData('level', zoneNodes);
+
+					console.log(zoneNodes);
+
+		        	var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
+		        		color: 0xd79fd4,
+		        		opacity: 0.5,
+		        		transparent: true
+		        	}));
+
+
+
+		        	scene.add(mesh);
+		        }, null);
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor(0xffffff);
+				container.appendChild( renderer.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX ) / 2;
+				mouseY = ( event.clientY - windowHalfY ) / 2;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				camera.position.x = -10;
+				camera.position.y = 14;
+
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
