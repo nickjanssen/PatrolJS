@@ -49,6 +49,10 @@
 
 			var player, target;
 
+			var playerNavMeshGroup;
+
+			var calculatedPath = null;
+
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -94,6 +98,10 @@
 		        	}));
 
 		        	scene.add(mesh);
+
+
+		        	// Set the player's navigation mesh group
+		        	playerNavMeshGroup = patrol.getGroup('level', player.position);
 
 		        }, null);
 
@@ -144,6 +152,9 @@
 				if ( intersects.length > 0 ) {
 					var vec = intersects[0].point;
 					target.position.copy(vec);
+
+					// Calculate a path to the target
+					calculatedPath = patrol.findPath(player.position, target.position, 'level', playerNavMeshGroup);
 				}
 
 			}
@@ -177,23 +188,34 @@
 			}
 
 			function tick(dTime) {
-				var speed = 5;
-
-				var vel = target.position.clone().sub(player.position);
-
-				if (vel.lengthSq() > 0.01) {
-					vel.normalize();
-
-					// move player to target
-					player.position.add(vel.multiplyScalar(dTime*speed));
-				}
-			}
-
-			function render() {
 
 				if (!level) {
 					return;
 				}
+
+				var speed = 5;
+
+				var targetPosition;
+
+				if (calculatedPath && calculatedPath.length) {
+					targetPosition = calculatedPath[0];
+
+					var vel = targetPosition.clone().sub(player.position);
+
+					if (vel.lengthSq() > 0.05 * 0.05) {
+						vel.normalize();
+
+						// move player to target
+						player.position.add(vel.multiplyScalar(dTime*speed));
+					}
+					else {
+						// Remove node from the path we calculated
+						calculatedPath.shift();
+					}
+				}
+			}
+
+			function render() {
 
 
 				camera.position.x = -10;

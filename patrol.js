@@ -1210,7 +1210,17 @@
 			var threeVectors = [];
 
 			_.each(channel.path, function (c) {
-				threeVectors.push(new THREE.Vector3(c.x, c.y, c.z));
+				var vec = new THREE.Vector3(c.x, c.y, c.z);
+
+				// console.log(vec.clone().sub(startPosition).length());
+
+				// Ensure the intermediate steps aren't too close to the start position
+				// var dist = vec.clone().sub(startPosition).lengthSq();
+				// if (dist > 0.01 * 0.01) {
+					threeVectors.push(vec);
+				// }
+
+
 			});
 
 			// We don't need the first one, as we already know our start position
