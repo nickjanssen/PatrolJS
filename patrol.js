@@ -1079,29 +1079,20 @@
 		return pts;
 	};
 
-	var zoneNodes = {};
-	var path = null;
-
-	_.extend(exports, {
-		buildNodes: function (geometry) {
-			var navigationMesh = buildNavigationMesh(geometry);
-
-			var zoneNodes = groupNavMesh(navigationMesh);
-
-			return zoneNodes;
-		},
-		setZoneData: function (zone, data) {
-			zoneNodes[zone] = data;
-		},
-		getGroup: function (zone, position) {
-
-			if (!zoneNodes[zone]) return null;
+	function ZoneData(geometry)
+	{
+		var navigationMesh = buildNavigationMesh(geometry);
+		this.nodes = groupNavMesh(navigationMesh);
+	}
+	
+	ZoneData.prototype = {
+		getGroup: function (position) {
 
 			var closestNodeGroup = null;
 
 			var distance = Math.pow(50, 2);
 
-			_.each(zoneNodes[zone].groups, function (group, index) {
+			_.each(this.nodes.groups, function (group, index) {
 				_.each(group, function (node) {
 					var measuredDistance = distanceToSquared(node.centroid, position);
 					if (measuredDistance < distance) {
@@ -1113,16 +1104,14 @@
 
 			return closestNodeGroup;
 		},
-		getRandomNode: function (zone, group, nearPosition, nearRange) {
-
-			if (!zoneNodes[zone]) return new THREE.Vector3();
+		getRandomNode: function (group, nearPosition, nearRange) {
 
 			nearPosition = nearPosition || null;
 			nearRange = nearRange || 0;
 
 			var candidates = [];
 
-			var polygons = zoneNodes[zone].groups[group];
+			var polygons = this.nodes.groups[group];
 
 			_.each(polygons, function (p) {
 				if (nearPosition && nearRange) {
@@ -1136,10 +1125,10 @@
 
 			return _.sample(candidates) || new THREE.Vector3();
 		},
-		findPath: function (startPosition, targetPosition, zone, group) {
+		findPath: function (startPosition, targetPosition, group) {
 
-			var allNodes = zoneNodes[zone].groups[group];
-			var vertices = zoneNodes[zone].vertices;
+			var allNodes = this.nodes.groups[group];
+			var vertices = this.nodes.vertices;
 
 			var closestNode = null;
 			var distance = Math.pow(50, 2);
@@ -1227,6 +1216,33 @@
 			threeVectors.shift();
 
 			return threeVectors;
+		}
+	};
+
+	var zoneNodes = {};
+
+	_.extend(exports, {
+		
+		buildNodes: function (geometry) {
+			return new ZoneData(geometry);
+		},
+
+		setZoneData: function (zone, data) {
+			zoneNodes[zone] = data;
+		},
+
+		getGroup: function (zone, position) {
+			if (!zoneNodes[zone]) return null;
+			return zoneNodes[zone].getGroup(position);
+		},
+
+		getRandomNode: function (zone, group, nearPosition, nearRange) {
+			if (!zoneNodes[zone]) return new THREE.Vector3();
+			return zoneNodes[zone].getRandomNode(group, nearPosition, nearRange);
+		},
+
+		findPath: function (startPosition, targetPosition, zone, group) {
+			return zoneNodes[zone].findPath(startPosition, targetPosition, group);
 		}
 	});
 
