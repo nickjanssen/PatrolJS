@@ -1,4 +1,7 @@
 # PatrolJS
+
+## Deprecated - please use [three-pathfinding](https://github.com/donmccurdy/three-pathfinding) instead.
+
 Navigation mesh toolkit for ThreeJS
 
 PatrolJS helps your AI agents navigate around your world. It uses the A* and Funnel algorithms to calculate a path on a navigation mesh.
